@@ -16,7 +16,7 @@ class ViewController: UIViewController {
     private var xMarkedOnBoard: [GameButton] = []
     private var oMarkedOnBoard: [GameButton] = []
     private var trackforFullBoard: Int = 0
-    private var winner: String? = ""
+    private var winner: String? = nil
     private var player1WinCount: Int = 0
     private var player2WinCount: Int = 0
     
@@ -25,54 +25,36 @@ class ViewController: UIViewController {
     }
     
     @IBAction func startGame(_ sender: GameButton) {
+        func markTheBoard(gameButton: GameButton, mark: String, color: UIColor) {
+            gameButton.setTitle(mark, for: .normal)
+            gameButton.setTitleColor(color, for: .normal)
+            gameButton.isEnabled = false
+            TicTacToeBrain.gameBoard[gameButton.row][gameButton.col] = mark
+            trackforFullBoard += 1
+        }
+        
         if TicTacToeBrain.player1 {
-            putPlayerMark(gameButton: sender, mark: Player.x.mark, color: Player.x.color, collectingArr: &xMarkedOnBoard)
+            markTheBoard(gameButton: sender, mark: Player.x.mark, color: Player.x.color)
             transitionToNextPlayer(nextPlayerName: Player.o.playerName, nextPlayerMark: Player.o.mark)
         } else {
-            putPlayerMark(gameButton: sender, mark: Player.o.mark, color: Player.o.color, collectingArr: &oMarkedOnBoard)
+            markTheBoard(gameButton: sender, mark: Player.o.mark, color: Player.o.color)
             transitionToNextPlayer(nextPlayerName: Player.x.playerName, nextPlayerMark: Player.x.mark)
         }
         
-    if xMarkedOnBoard.count >= 3 {
-        checkforWin(arr: xMarkedOnBoard, player: Player.x.playerName)
-        }
-    if oMarkedOnBoard.count >= 3 {
-        checkforWin(arr: oMarkedOnBoard, player: Player.o.playerName)
-        }
-    }
-    
-    func gameOver() {
-        buttons.forEach{ $0.isEnabled = false }
-        if let safeWinner = winner {
-            displayMessage.text = "Game Over. \nWinner is \(safeWinner)"
-            if safeWinner == "Player 1" {
-                player1WinCount += 1
-                player1WinMessage.text = "Player 1 Win: \(player1WinCount)"
-            } else {
-                player2WinCount += 1
-                player2WinMessage.text = "Player 2 Win: \(player2WinCount)"
-            }
-        } else {
-            displayMessage.text = "Game Over.\nIt's a tie."
-        }
+        checkGameboardForWin(player: Player.x.mark)
+        checkGameboardForWin(player: Player.o.mark)
     }
 
     @IBAction func restartGame(_ resetButton: UIButton) {
         buttons.forEach{ $0.setTitle("", for: .normal)}
         displayMessage.text = "Player 1 (X), your turn."
         trackforFullBoard = 0
+        winner = nil
         buttons.forEach{ $0.isEnabled = true }
         TicTacToeBrain.player1 = true
-        xMarkedOnBoard.removeAll()
-        oMarkedOnBoard.removeAll()
-    }
-    
-    private func putPlayerMark(gameButton: GameButton, mark: String, color: UIColor, collectingArr: inout [GameButton]) {
-        gameButton.setTitle(mark, for: .normal)
-        gameButton.setTitleColor(color, for: .normal)
-        gameButton.isEnabled = false
-        collectingArr.append(gameButton)
-        trackforFullBoard += 1
+        TicTacToeBrain.gameBoard = [[".",".","."],
+        [".",".","."],
+        [".",".","."]]
     }
     
     private func transitionToNextPlayer(nextPlayerName: String, nextPlayerMark: String) {
@@ -80,26 +62,56 @@ class ViewController: UIViewController {
         TicTacToeBrain.player1 = !TicTacToeBrain.player1
     }
     
-    private func checkforWin(arr: [GameButton], player: String) {
-        print("experiemntal branch")
-        for button1 in arr[0..<arr.count-2] {
-            for button2 in arr[0..<arr.count-1] {
-                for button3 in arr[0..<arr.count] {
-                    if ((button2.row == button1.row && button3.row == button1.row) ||
-                        (button2.col == button1.col && button3.col == button1.col) ||
-                        (button1.row == button1.col && button2.row == button2.col && button3.row == button3.col) ||
-                        ((button1.row + button1.col == 2) && (button2.row + button2.col == 2) && (button3.row + button3.col == 2)))
-                        && button1 != button2 && button2 != button3 && button1 != button3 {
-                        winner = player
-                        gameOver()
-                        }
-                    else if trackforFullBoard == 9 {
-                        winner = nil
-                        gameOver()
-                    }
-                }
+    private func checkGameboardForWin(player: String) {
+        if TicTacToeBrain.gameBoard[0][0] == player && TicTacToeBrain.gameBoard[0][1] == player && TicTacToeBrain.gameBoard[0][2] == player {
+            winner = player
+            gameOver()
+        } else if TicTacToeBrain.gameBoard[1][0] == player && TicTacToeBrain.gameBoard[1][1] == player && TicTacToeBrain.gameBoard[1][2] == player {
+            winner = player
+            gameOver()
+        } else if TicTacToeBrain.gameBoard[2][0] == player && TicTacToeBrain.gameBoard[2][1] == player && TicTacToeBrain.gameBoard[2][2] == player {
+            winner = player
+            gameOver()
+        } else if TicTacToeBrain.gameBoard[0][0] == player && TicTacToeBrain.gameBoard[1][0] == player && TicTacToeBrain.gameBoard[2][0] == player {
+            winner = player
+            gameOver()
+        } else if TicTacToeBrain.gameBoard[0][1] == player && TicTacToeBrain.gameBoard[1][1] == player && TicTacToeBrain.gameBoard[2][1] == player {
+            winner = player
+            gameOver()
+        } else if TicTacToeBrain.gameBoard[0][2] == player && TicTacToeBrain.gameBoard[1][2] == player && TicTacToeBrain.gameBoard[2][2] == player {
+            winner = player
+            gameOver()
+        } else if TicTacToeBrain.gameBoard[0][0] == player && TicTacToeBrain.gameBoard[1][1] == player && TicTacToeBrain.gameBoard[2][2] == player {
+            winner = player
+            gameOver()
+        } else if TicTacToeBrain.gameBoard[0][2] == player && TicTacToeBrain.gameBoard[1][1] == player && TicTacToeBrain.gameBoard[2][0] == player {
+            winner = player
+            gameOver()
+        } else {
+            checkForFullBoard()
+        }
+    }
+    
+    private func checkForFullBoard() {
+        if trackforFullBoard == 9 {
+            gameOver()
+            winner = nil
+        }
+    }
+    
+    private func gameOver() {
+        buttons.forEach{ $0.isEnabled = false }
+        if let safeWinner = winner {
+            displayMessage.text = "Game Over. \nWinner is \(safeWinner)"
+            if safeWinner == Player.x.mark {
+                player1WinCount += 1
+                player1WinMessage.text = "Player 1 Win: \(player1WinCount)"
+            } else if safeWinner == Player.o.mark {
+                player2WinCount += 1
+                player2WinMessage.text = "Player 2 Win: \(player2WinCount)"
             }
+        } else {
+            displayMessage.text = "Game Over.\nIt's a tie."
         }
     }
 }
-

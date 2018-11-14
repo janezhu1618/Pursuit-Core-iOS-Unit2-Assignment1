@@ -13,6 +13,9 @@ class TicTacToeBrain {
     var mark: String
     var color: UIColor
     static var player1 = true
+    static var gameBoard: [[String]] = [["","",""],
+                                        ["","",""],
+                                        ["","",""]]
     
     init(playerName: String, mark: String, color: UIColor) {
         self.playerName = playerName
