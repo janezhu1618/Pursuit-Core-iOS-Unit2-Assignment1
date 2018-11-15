@@ -17,6 +17,8 @@ class TicTacToeBrain {
                                         ["","",""],
                                         ["","",""]]
     
+    
+    
     init(playerName: String, mark: String, color: UIColor) {
         self.playerName = playerName
         self.mark = mark
